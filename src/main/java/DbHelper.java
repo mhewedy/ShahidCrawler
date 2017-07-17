@@ -29,4 +29,11 @@ class DbHelper {
         handle.insert("insert into episode (sid, video_url, duration_seconds, series_id) values" +
                 " (?, ?, ?, ?)", episode.sid, episode.videoUrl, episode.durationSeconds, seriesId);
     }
+
+    static boolean ifSeriesNotExists(Handle handle, String seriesSid) {
+        Long count = (Long) handle.select("select count(*) as count from series where sid = ?", seriesSid)
+                .get(0).get("count");
+
+        return count == 0;
+    }
 }

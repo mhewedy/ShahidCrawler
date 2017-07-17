@@ -49,14 +49,18 @@ public class Main {
         for (Series series : seriesList){
             System.out.println(series);
 
-            series.tag.forEach(t -> DbHelper.insertTagIfNotExists(handle, t));
-            DbHelper.insertSeries(handle, series);
-            DbHelper.linkSeriesWithTags(handle, series.sid, series.tag);
+            if (DbHelper.ifSeriesNotExists(handle, series.sid)){
+                series.tag.forEach(t -> DbHelper.insertTagIfNotExists(handle, t));
+                DbHelper.insertSeries(handle, series);
+                DbHelper.linkSeriesWithTags(handle, series.sid, series.tag);
 
-            List<Episode> listOfEpisodes = getListOfEpisodes(series.sid);
+                List<Episode> listOfEpisodes = getListOfEpisodes(series.sid);
 
-            for (Episode episode : listOfEpisodes){
-                DbHelper.insertEpisode(handle, series.sid, episode);
+                for (Episode episode : listOfEpisodes){
+                    DbHelper.insertEpisode(handle, series.sid, episode);
+                }
+            }else{
+                System.out.println("series " + series.sid + " already exists.");
             }
         }
         handle.close();
