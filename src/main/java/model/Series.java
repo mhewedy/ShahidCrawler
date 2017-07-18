@@ -62,7 +62,7 @@ public class Series {
     }
 
     public static List<Series> search(DBI dbi, String term) {
-        return dbi.withHandle(h -> h.select("select * from series where title like '%?%'", term))
+        return dbi.withHandle(h -> h.select("select * from series where title like ?", "%" + term + "%"))
                 .stream()
                 .map(Series::fromDb)
                 .collect(toList());
@@ -116,7 +116,7 @@ public class Series {
         return series;
     }
 
-    private static Series fromDb(Map<String, Object> dbRow) {
+    static Series fromDb(Map<String, Object> dbRow) {
         Series series = new Series();
         series.id = (Integer) dbRow.get("id");
         series.sid = (String) dbRow.get("sid");

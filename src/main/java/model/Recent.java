@@ -1,23 +1,34 @@
 package model;
 
 import org.skife.jdbi.v2.DBI;
+import util.Config;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class Recent {
 //    private int seriesId;
 
-    public static List<Integer> findAll(DBI dbi) {
-        return dbi.withHandle(h -> h.select("select series_id from recent order by id desc"))
+    public static List<Series> findAll(DBI dbi) {
+        return dbi.withHandle(h -> h.select("select series.* from series join recent on series.id = recent.series_id order by recent.id desc"))
                 .stream()
-                .map(row -> (Integer) row.get("series_id"))
+                .map(Series::fromDb)
                 .collect(toList());
     }
 
-    public static void save(DBI dbi, int seriesId) {
+    public static synchronized void save(DBI dbi, int seriesId) {
+
         dbi.withHandle(h -> h.update("delete from recent where series_id = ?", seriesId));
+
+        String recentIds = dbi.withHandle(h ->
+                h.select("select id from recent order by id desc limit ?", Config.MAX_RECENT - 1))
+                .stream()
+                .map(row -> String.valueOf(row.get("id")))
+                .collect(joining(", "));
+
+        dbi.withHandle(h -> h.update("delete from recent where id not in (" + recentIds + ")"));
         dbi.withHandle(h -> h.insert("insert into recent (series_id) values (?)", seriesId));
     }
 }

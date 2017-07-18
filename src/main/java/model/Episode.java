@@ -19,7 +19,7 @@ public class Episode {
 
     private String sid;
     private String videoUrl;
-    private long durationSeconds;
+    private int durationSeconds;
 
     public void save(Handle handle, String seriesSid) {
         Object seriesId = handle.select("select id from series where sid = ?", seriesSid).get(0).get("id");
@@ -91,7 +91,7 @@ public class Episode {
         Episode episode = new Episode();
         episode.sid = (String) dbRow.get("sid");
         episode.videoUrl = (String) dbRow.get("video_url");
-        episode.durationSeconds = (long) dbRow.get("duration_seconds");
+        episode.durationSeconds = (int) dbRow.get("duration_seconds");
         return episode;
     }
 
@@ -101,6 +101,6 @@ public class Episode {
 
     private static class Data {
         private String url;
-        private long durationSeconds;
+        private int durationSeconds;
     }
 }
