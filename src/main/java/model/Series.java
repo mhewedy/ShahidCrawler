@@ -37,17 +37,17 @@ public class Series {
     public void save(Handle handle) {
         //saveTagsIfNotExists
         this.tags.forEach
-                (tag -> handle.execute("save into tag (tag) select ? from dual where not exists " +
+                (tag -> handle.execute("insert into tag (tag) select ? from dual where not exists " +
                         "(select * from tag where tag= ? )", tag, tag));
         //save
-        handle.insert("save into series (sid, title, poster_url) values (?, ?, ?)",
+        handle.insert("insert into series (sid, title, poster_url) values (?, ?, ?)",
                 this.sid, this.title, this.posterUrl);
         //linkWithTags
         Object seriesId = handle.select("select id from series where sid = ?", this.sid).get(0).get("id");
 
         for (String tag : this.tags) {
             Object tagId = handle.select("select id from tag where tag = ?", tag).get(0).get("id");
-            handle.insert("save into series_tag (series_id, tag_id) values (?, ?)", seriesId, tagId);
+            handle.insert("insert into series_tag (series_id, tag_id) values (?, ?)", seriesId, tagId);
         }
     }
 

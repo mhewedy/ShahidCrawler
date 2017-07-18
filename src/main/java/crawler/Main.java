@@ -12,6 +12,7 @@ import model.Series;
 
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
+import org.skife.jdbi.v2.logging.PrintStreamLog;
 import util.Config;
 
 public class Main {
@@ -23,6 +24,7 @@ public class Main {
     private static void startCrawler() throws Exception{
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
+        dbi.setSQLLog(new PrintStreamLog());
         Handle handle = dbi.open();
 
         skipSSL();

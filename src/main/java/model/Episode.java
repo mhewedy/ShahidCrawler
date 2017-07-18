@@ -24,7 +24,7 @@ public class Episode {
     public void save(Handle handle, String seriesSid) {
         Object seriesId = handle.select("select id from series where sid = ?", seriesSid).get(0).get("id");
 
-        handle.insert("save into episode (sid, video_url, duration_seconds, series_id) values" +
+        handle.insert("insert into episode (sid, video_url, duration_seconds, series_id) values" +
                 " (?, ?, ?, ?)", this.sid, this.videoUrl, this.durationSeconds, seriesId);
     }
 

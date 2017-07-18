@@ -16,6 +16,7 @@ import static spark.Spark.*;
 public class Api {
 
     public static void main(String[] args) {
+        // default port 4567
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
@@ -57,7 +58,7 @@ public class Api {
 
     }
 
-    public static class JsonTransformer implements ResponseTransformer {
+    private static class JsonTransformer implements ResponseTransformer {
 
         @Override
         public String render(Object model) {
