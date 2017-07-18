@@ -6,15 +6,15 @@ import util.Config;
 
 import java.io.IOException;
 
-class JSoupHelper {
+public class JSoupHelper {
 
-    static Document connectAndGetDoc(String url) throws IOException {
+    public static Document connectAndGetDoc(String url) throws IOException {
         Document document = Jsoup.connect(url).get();
         sleep();
         return document;
     }
 
-    static String connectAndGetString(String url) throws IOException {
+    public static String connectAndGetString(String url) throws IOException {
         String body = Jsoup.connect(url).cookie("JSESSIONID", Config.JSESSIONID).cookie("X-BE", Config.XBE).ignoreContentType(true)
                 .execute().body();
         sleep();

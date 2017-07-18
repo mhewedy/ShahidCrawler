@@ -1,5 +1,7 @@
 package crawler;
 
+import model.Episode;
+import model.Series;
 import org.skife.jdbi.v2.Handle;
 
 import java.util.List;
@@ -11,9 +13,9 @@ class DbHelper {
                 + "' from dual where not exists (select * from tag where tag='" + tag + "')");
     }
 
-    static void insertSeries(Handle handle, Main.Series series) {
+    static void insertSeries(Handle handle, Series series) {
         handle.insert("insert into series (sid, title, poster_url) values (?, ?, ?)",
-                series.sid, series.title, series.posterUrl);
+                series.getSid(), series.getTitle(), series.getPosterUrl());
     }
 
     static void linkSeriesWithTags(Handle handle, String seriesSid, List<String> tags) {
@@ -25,11 +27,11 @@ class DbHelper {
         }
     }
 
-    static void insertEpisode(Handle handle, String seriesSid, Main.Episode episode) {
+    static void insertEpisode(Handle handle, String seriesSid, Episode episode) {
         Object seriesId = handle.select("select id from series where sid = ?", seriesSid).get(0).get("id");
 
         handle.insert("insert into episode (sid, video_url, duration_seconds, series_id) values" +
-                " (?, ?, ?, ?)", episode.sid, episode.videoUrl, episode.durationSeconds, seriesId);
+                " (?, ?, ?, ?)", episode.getSid(), episode.getVideoUrl(), episode.getDurationSeconds(), seriesId);
     }
 
     static boolean seriesNotExists(Handle handle, String seriesSid) {
