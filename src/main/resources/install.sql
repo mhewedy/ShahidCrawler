@@ -33,6 +33,7 @@ CREATE TABLE episode
   sid   VARCHAR(50),
   video_url VARCHAR(250),
   duration_seconds	int,
+  watched tinyint,
   series_id	int
 );
 

@@ -61,6 +61,14 @@ public class Api {
             return Series.findAllByTag(dbi, request.queryParams("tag"));
         }, new JsonTransformer());
 
+        // /episode/watched/1
+        get("/episode/watched/:id", (request, response) -> {
+            response.type("application/json");
+            response.header("Access-Control-Allow-Origin", "*");
+            Episode.setAsWatched(dbi, Integer.parseInt(request.params("id")));
+            return null;
+        }, new JsonTransformer());
+
     }
 
     private static class JsonTransformer implements ResponseTransformer {

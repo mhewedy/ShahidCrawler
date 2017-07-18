@@ -17,9 +17,11 @@ import static java.util.stream.Collectors.toList;
 
 public class Episode {
 
+    private int id;
     private String sid;
     private String videoUrl;
     private int durationSeconds;
+    private boolean watched;
 
     public void save(Handle handle, String seriesSid) {
         Object seriesId = handle.select("select id from series where sid = ?", seriesSid).get(0).get("id");
@@ -67,6 +69,10 @@ public class Episode {
         return episodesList;
     }
 
+    public static void setAsWatched(DBI dbi, int episodeId){
+        dbi.withHandle(h -> h.update("update episode set watched = 1 where id = ?", episodeId));
+    }
+
     private static List<String> getToC(String seriesId) throws Exception {
         String episodesUrl = Constants.EPISODES_URL.replace("$1", seriesId).replace("$2", getSectionId(seriesId));
 
@@ -89,9 +95,11 @@ public class Episode {
 
     private static Episode fromDb(Map<String, Object> dbRow) {
         Episode episode = new Episode();
+        episode.id = (int) dbRow.get("id");
         episode.sid = (String) dbRow.get("sid");
         episode.videoUrl = (String) dbRow.get("video_url");
         episode.durationSeconds = (int) dbRow.get("duration_seconds");
+        episode.watched = Integer.valueOf(1).equals(dbRow.get("watched"));
         return episode;
     }
 
