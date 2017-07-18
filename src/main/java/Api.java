@@ -1,7 +1,10 @@
 
 import model.Episode;
 import model.Series;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
 import spark.ResponseTransformer;
+import util.Config;
 import util.Util;
 
 import java.util.ArrayList;
@@ -9,9 +12,11 @@ import java.util.Arrays;
 
 import static spark.Spark.*;
 
-public class Main {
+public class Api {
 
     public static void main(String[] args) {
+
+        DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
 
         get("/series/search",  (request, response) -> {
             response.type("application/json");
@@ -19,8 +24,7 @@ public class Main {
             String term = request.queryParams("term");
             System.out.println("search series with term: " + term);
 
-
-            return Arrays.asList(new Series());
+            return Series.search(dbi, term);
         }, new JsonTransformer());
 
         get("/episode/series/:id", (request, response) -> {
@@ -55,7 +59,6 @@ public class Main {
 
             return new ArrayList<Series>();
         }, new JsonTransformer());
-
 
     }
 

@@ -3,13 +3,16 @@ package model;
 import crawler.JSoupHelper;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
+import sun.reflect.generics.tree.ReturnType;
 import util.Config;
 import util.Constants;
 import util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -85,6 +88,21 @@ public class Series {
         Category[] categories = Util.GSON.fromJson(firstDiv.attr("categories"), Category[].class);
         series.tags = Stream.of(categories).map(Category::getName).collect(Collectors.toList());
 
+        return series;
+    }
+
+    public static List<Series> search(DBI dbi, String term) {
+        return dbi.withHandle(h -> h.select("select * from series where title like '%?%'", term))
+                .stream()
+                .map(Series::fromDb)
+                .collect(Collectors.toList());
+    }
+
+    private static Series fromDb(Map<String, Object> dbRow){
+        Series series = new Series();
+        series.sid = (String) dbRow.get("sid");
+        series.title = (String) dbRow.get("title");
+        series.posterUrl = (String) dbRow.get("poster_url");
         return series;
     }
 }
