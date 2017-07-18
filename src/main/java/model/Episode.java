@@ -1,6 +1,7 @@
 package model;
 
 import org.jsoup.nodes.Document;
+import org.skife.jdbi.v2.Handle;
 import util.Constants;
 import util.Util;
 
@@ -17,16 +18,11 @@ public class Episode {
     private String videoUrl;
     private long durationSeconds;
 
-    public String getSid() {
-        return sid;
-    }
+    public void save(Handle handle, String seriesSid) {
+        Object seriesId = handle.select("select id from series where sid = ?", seriesSid).get(0).get("id");
 
-    public String getVideoUrl() {
-        return videoUrl;
-    }
-
-    public long getDurationSeconds() {
-        return durationSeconds;
+        handle.insert("save into episode (sid, video_url, duration_seconds, series_id) values" +
+                " (?, ?, ?, ?)", this.sid, this.videoUrl, this.durationSeconds, seriesId);
     }
 
     @Override
@@ -89,5 +85,4 @@ public class Episode {
         private String url;
         private long durationSeconds;
     }
-
 }

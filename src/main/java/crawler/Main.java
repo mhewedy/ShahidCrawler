@@ -1,10 +1,6 @@
 package crawler;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -13,16 +9,10 @@ import javax.net.ssl.X509TrustManager;
 
 import model.Episode;
 import model.Series;
-import org.jsoup.nodes.Document;
 
-import com.google.gson.Gson;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import util.Config;
-import util.Constants;
-import util.Util;
 
 public class Main {
 
@@ -42,16 +32,11 @@ public class Main {
         for (Series series : seriesList){
             System.out.println(series);
 
-            if (DbHelper.seriesNotExists(handle, series.getSid())){
-
-                series.getTags().forEach(t -> DbHelper.insertTagIfNotExists(handle, t));
-                DbHelper.insertSeries(handle, series);
-                DbHelper.linkSeriesWithTags(handle, series.getSid(), series.getTags());
-
+            if (series.notExists(handle)){
+                series.save(handle);
                 List<Episode> listOfEpisodes = Episode.getEpisodesList(series.getSid());
-
                 for (Episode episode : listOfEpisodes){
-                    DbHelper.insertEpisode(handle, series.getSid(), episode);
+                    episode.save(handle, series.getSid());
                 }
             }else{
                 System.out.println("series " + series.getSid() + " already exists.");

@@ -3,6 +3,7 @@ package model;
 import crawler.JSoupHelper;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.skife.jdbi.v2.Handle;
 import util.Config;
 import util.Constants;
 import util.Util;
@@ -23,16 +24,27 @@ public class Series {
         return sid;
     }
 
-    public String getTitle() {
-        return title;
+    public boolean notExists(Handle handle) {
+        Long count = (Long) handle.select("select count(*) as count from series where sid = ?", this.sid)
+                .get(0).get("count");
+        return count == 0;
     }
 
-    public String getPosterUrl() {
-        return posterUrl;
-    }
+    public void save(Handle handle) {
+        //saveTagsIfNotExists
+        this.tags.forEach
+                (tag -> handle.execute("save into tag (tag) select ? from dual where not exists " +
+                        "(select * from tag where tag= ? )", tag, tag));
+        //save
+        handle.insert("save into series (sid, title, poster_url) values (?, ?, ?)",
+                this.sid, this.title, this.posterUrl);
+        //linkWithTags
+        Object seriesId = handle.select("select id from series where sid = ?", this.sid).get(0).get("id");
 
-    public List<String> getTags() {
-        return tags;
+        for (String tag : this.tags) {
+            Object tagId = handle.select("select id from tag where tag = ?", tag).get(0).get("id");
+            handle.insert("save into series_tag (series_id, tag_id) values (?, ?)", seriesId, tagId);
+        }
     }
 
     @Override
