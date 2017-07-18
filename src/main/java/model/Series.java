@@ -60,6 +60,20 @@ public class Series {
                 '}';
     }
 
+    public static List<Series> search(DBI dbi, String term) {
+        return dbi.withHandle(h -> h.select("select * from series where title like '%?%'", term))
+                .stream()
+                .map(Series::fromDb)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Series> findByTag(DBI dbi, String tag) {
+        return dbi.withHandle(h -> h.select("select * from series where tag = ?", tag))
+                .stream()
+                .map(Series::fromDb)
+                .collect(Collectors.toList());
+    }
+
     public static List<Series> getSeriesList() throws Exception {
         List<Series> idList = new ArrayList<>();
 
@@ -73,6 +87,8 @@ public class Series {
         }
         return idList;
     }
+
+     // ---------- private --------------
 
     private static Series fromElement(Element element){
         Series series = new Series();
@@ -89,13 +105,6 @@ public class Series {
         series.tags = Stream.of(categories).map(Category::getName).collect(Collectors.toList());
 
         return series;
-    }
-
-    public static List<Series> search(DBI dbi, String term) {
-        return dbi.withHandle(h -> h.select("select * from series where title like '%?%'", term))
-                .stream()
-                .map(Series::fromDb)
-                .collect(Collectors.toList());
     }
 
     private static Series fromDb(Map<String, Object> dbRow){

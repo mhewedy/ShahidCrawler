@@ -49,11 +49,7 @@ public class Api {
 
         get("/tag", (request, response) -> {
             response.type("application/json");
-
-            String tag = request.queryParams("tag");
-            System.out.println("get list of series for tag: " + tag);
-
-            return new ArrayList<Series>();
+            return Series.findByTag(dbi, request.queryParams("tag"));
         }, new JsonTransformer());
 
     }
