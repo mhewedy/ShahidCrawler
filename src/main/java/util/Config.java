@@ -3,7 +3,7 @@ package util;
 public interface Config {
 
     int TOTAL_PAGES = 13;      // change me to include more pages, currently there's only 13 pages
-    String JSESSIONID = "069D7D460B7B3CE5D1E0A39B3B88500C";    // change me with a working session id
+    String JSESSIONID = "6928504F0E8FBC00077389399837209A";    // change me with a working session id
     String XBE = "N1"; // change me for working XBE parameter (I don't know what is it, but the session won't be valid without it)
 
     String JDBC_URL = "jdbc:mysql://192.168.1.10:3306/shahid?useUnicode=true&characterEncoding=UTF-8";

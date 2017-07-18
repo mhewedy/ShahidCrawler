@@ -77,7 +77,7 @@ public class Series {
 
 
     public static List<String> getAllTags(DBI dbi) {
-        return dbi.withHandle(h -> h.select("select tag from tag"))
+        return dbi.withHandle(h -> h.select("select tag from tag order by tag asc"))
                 .stream()
                 .map(row -> (String) row.get("tag"))
                 .collect(toList());

@@ -24,11 +24,13 @@ public class Api {
         // /series/search?term=xxx
         get("/series/search",  (request, response) -> {
             response.type("application/json");
+            response.header("Access-Control-Allow-Origin", "*");
             return Series.search(dbi, request.queryParams("term"));
         }, new JsonTransformer());
 
         get("/episode/series/:id", (request, response) -> {
             response.type("application/json");
+            response.header("Access-Control-Allow-Origin", "*");
             String id = request.params("id");
             List<Episode> allBySeriesId = Episode.findAllBySeriesId(dbi, Integer.parseInt(id));
             if (allBySeriesId.size() > 0){
@@ -40,12 +42,14 @@ public class Api {
         // /recent
         get("/recent", (request, response) -> {
             response.type("application/json");
+            response.header("Access-Control-Allow-Origin", "*");
             return Recent.findAll(dbi);
         }, new JsonTransformer());
 
         // /tags
         get("/tags", (request, response) -> {
             response.type("application/json");
+            response.header("Access-Control-Allow-Origin", "*");
             return Series.getAllTags(dbi);
         }, new JsonTransformer());
 
@@ -53,6 +57,7 @@ public class Api {
         // /tag?tag=xxx
         get("/tag", (request, response) -> {
             response.type("application/json");
+            response.header("Access-Control-Allow-Origin", "*");
             return Series.findAllByTag(dbi, request.queryParams("tag"));
         }, new JsonTransformer());
 

@@ -2,6 +2,10 @@
 select series.title, tag.tag from series join episode on series.id = episode.series_id join series_tag on series.id = series_tag.series_id join tag on tag.id = series_tag.tag_id where episode.video_url is null;
 
 -- find series that have one or more episodes not inserted (may be all espisods not insereted as a result for getToc return zero list)
-select * from series left outer join episode on series.id = episode.series_id where episode.id is null
+select * from series left outer join episode on series.id = episode.series_id where episode.id is null;
 
 
+-- delete all invalid series data
+delete from series_tag where series_id = 257;
+delete from series where id = 257;
+delete from episode where series_id = 257;
