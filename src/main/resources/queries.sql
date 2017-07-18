@@ -3,3 +3,5 @@ select series.title, tag.tag from series join episode on series.id = episode.ser
 
 -- find series that have one or more episodes not inserted (may be all getToc return zero list)
 select * from series left outer join episode on series.id = episode.series_id where episode.id is null
+
+
