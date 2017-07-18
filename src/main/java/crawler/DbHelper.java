@@ -9,8 +9,7 @@ import java.util.List;
 class DbHelper {
 
     static void insertTagIfNotExists(Handle handle, String tag) {
-        handle.execute("insert into tag (tag)  select '" + tag
-                + "' from dual where not exists (select * from tag where tag='" + tag + "')");
+        handle.execute("insert into tag (tag) select ? from dual where not exists (select * from tag where tag= ? )", tag, tag);
     }
 
     static void insertSeries(Handle handle, Series series) {
