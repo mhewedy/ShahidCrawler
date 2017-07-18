@@ -1,3 +1,5 @@
+package crawler;
+
 import org.skife.jdbi.v2.Handle;
 
 import java.util.List;
@@ -30,10 +32,9 @@ class DbHelper {
                 " (?, ?, ?, ?)", episode.sid, episode.videoUrl, episode.durationSeconds, seriesId);
     }
 
-    static boolean ifSeriesNotExists(Handle handle, String seriesSid) {
+    static boolean seriesNotExists(Handle handle, String seriesSid) {
         Long count = (Long) handle.select("select count(*) as count from series where sid = ?", seriesSid)
                 .get(0).get("count");
-
         return count == 0;
     }
 }
