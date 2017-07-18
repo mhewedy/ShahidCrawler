@@ -1,14 +1,11 @@
 
 import model.Episode;
+import model.Recent;
 import model.Series;
 import org.skife.jdbi.v2.DBI;
-import org.skife.jdbi.v2.Handle;
 import spark.ResponseTransformer;
 import util.Config;
 import util.Util;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 
 import static spark.Spark.*;
 
@@ -18,6 +15,7 @@ public class Api {
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
 
+        // /series/search?term=xxx
         get("/series/search",  (request, response) -> {
             response.type("application/json");
             return Series.search(dbi, request.queryParams("term"));
@@ -25,31 +23,29 @@ public class Api {
 
         get("/episode/series/:id", (request, response) -> {
             response.type("application/json");
-
             String id = request.params("id");
-            System.out.println("getting series with id: " + id);
+            Recent.save(dbi, Integer.parseInt(id));
 
-            // Save to recent
-
-            return new ArrayList<Episode>();
+            return Episode.findAllBySeriesId(dbi, Integer.parseInt(id));
         }, new JsonTransformer());
 
+        // /recent
         get("/recent", (request, response) -> {
             response.type("application/json");
-
-            return new ArrayList<Series>();
+            return Recent.findAll(dbi);
         }, new JsonTransformer());
 
+        // /tags
         get("/tags", (request, response) -> {
             response.type("application/json");
-
-            return Arrays.asList("tag1", "tag2");
+            return Series.getAllTags(dbi);
         }, new JsonTransformer());
 
 
+        // /tag?tag=xxx
         get("/tag", (request, response) -> {
             response.type("application/json");
-            return Series.findByTag(dbi, request.queryParams("tag"));
+            return Series.findAllByTag(dbi, request.queryParams("tag"));
         }, new JsonTransformer());
 
     }

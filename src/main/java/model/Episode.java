@@ -1,6 +1,7 @@
 package model;
 
 import org.jsoup.nodes.Document;
+import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import util.Constants;
 import util.Util;
@@ -8,9 +9,11 @@ import util.Util;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static crawler.JSoupHelper.connectAndGetDoc;
 import static crawler.JSoupHelper.connectAndGetString;
+import static java.util.stream.Collectors.toList;
 
 public class Episode {
 
@@ -32,6 +35,13 @@ public class Episode {
                 ", videoUrl='" + videoUrl + '\'' +
                 ", durationSeconds=" + durationSeconds +
                 '}';
+    }
+
+    public static List<Episode> findAllBySeriesId(DBI dbi, int seriesId) {
+        return dbi.withHandle(h -> h.select("select * from episode where series_id = ?", seriesId))
+                .stream()
+                .map(Episode::fromDb)
+                .collect(toList());
     }
 
     public static List<Episode> getEpisodesList(String seriesId) throws Exception {
@@ -75,6 +85,14 @@ public class Episode {
         Document doc = connectAndGetDoc(Constants.SERIES_URL.replace("$1", seriesId));
         String sectionText = doc.select("#main > div > div > div > div.pageing > ul > li.arrowlft > a").get(0).outerHtml();
         return sectionText.substring(sectionText.indexOf("showSection-") + 12, sectionText.indexOf("' + '.sort-' + "));
+    }
+
+    private static Episode fromDb(Map<String, Object> dbRow) {
+        Episode episode = new Episode();
+        episode.sid = (String) dbRow.get("sid");
+        episode.videoUrl = (String) dbRow.get("video_url");
+        episode.durationSeconds = (long) dbRow.get("duration_seconds");
+        return episode;
     }
 
     private static class Resp {

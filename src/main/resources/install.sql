@@ -1,5 +1,7 @@
 -- MYSQL
 
+-- sid means "shahid id"
+
 CREATE DATABASE shahid CHARACTER SET utf8 COLLATE utf8_general_ci;
 
 USE shahid;
@@ -34,3 +36,8 @@ CREATE TABLE episode
   series_id	int
 );
 
+CREATE TABLE recent
+(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  series_id	int
+);

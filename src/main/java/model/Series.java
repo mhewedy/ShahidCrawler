@@ -5,7 +5,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
-import sun.reflect.generics.tree.ReturnType;
 import util.Config;
 import util.Constants;
 import util.Util;
@@ -13,11 +12,13 @@ import util.Util;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class Series {
 
+    private int id;
     private String sid;
     private String title;
     private String posterUrl;
@@ -64,33 +65,41 @@ public class Series {
         return dbi.withHandle(h -> h.select("select * from series where title like '%?%'", term))
                 .stream()
                 .map(Series::fromDb)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
-    public static List<Series> findByTag(DBI dbi, String tag) {
-        return dbi.withHandle(h -> h.select("select * from series where tag = ?", tag))
+    public static List<Series> findAllByTag(DBI dbi, String tag) {
+        return dbi.withHandle(h -> h.select("select series.* from series join series_tag on series.id = series_tag.series_id join tag on tag.id = series_tag.tag_id where tag.tag = ?", tag))
                 .stream()
                 .map(Series::fromDb)
-                .collect(Collectors.toList());
+                .collect(toList());
+    }
+
+
+    public static List<String> getAllTags(DBI dbi) {
+        return dbi.withHandle(h -> h.select("select tag from tag"))
+                .stream()
+                .map(row -> (String) row.get("tag"))
+                .collect(toList());
     }
 
     public static List<Series> getSeriesList() throws Exception {
         List<Series> idList = new ArrayList<>();
 
-        for (int i = 0; i < Config.TOTAL_PAGES; i ++){
+        for (int i = 0; i < Config.TOTAL_PAGES; i++) {
             List<Series> internalList = JSoupHelper.connectAndGetDoc(Constants.SERIES_LIST_URL.replace("$1", i + ""))
                     .select("body > div")
                     .stream()
                     .map(Series::fromElement)
-                    .collect(Collectors.toList());
+                    .collect(toList());
             idList.addAll(internalList);
         }
         return idList;
     }
 
-     // ---------- private --------------
+    // ---------- private --------------
 
-    private static Series fromElement(Element element){
+    private static Series fromElement(Element element) {
         Series series = new Series();
 
         Elements divs = element.children();
@@ -102,13 +111,14 @@ public class Series {
         series.posterUrl = element.select(".photo > img").attr("src");
 
         Category[] categories = Util.GSON.fromJson(firstDiv.attr("categories"), Category[].class);
-        series.tags = Stream.of(categories).map(Category::getName).collect(Collectors.toList());
+        series.tags = Stream.of(categories).map(Category::getName).collect(toList());
 
         return series;
     }
 
-    private static Series fromDb(Map<String, Object> dbRow){
+    private static Series fromDb(Map<String, Object> dbRow) {
         Series series = new Series();
+        series.id = (Integer) dbRow.get("id");
         series.sid = (String) dbRow.get("sid");
         series.title = (String) dbRow.get("title");
         series.posterUrl = (String) dbRow.get("poster_url");
