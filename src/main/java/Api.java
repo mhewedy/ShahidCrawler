@@ -20,11 +20,7 @@ public class Api {
 
         get("/series/search",  (request, response) -> {
             response.type("application/json");
-
-            String term = request.queryParams("term");
-            System.out.println("search series with term: " + term);
-
-            return Series.search(dbi, term);
+            return Series.search(dbi, request.queryParams("term"));
         }, new JsonTransformer());
 
         get("/episode/series/:id", (request, response) -> {
