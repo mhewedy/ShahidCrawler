@@ -15,21 +15,17 @@ import static spark.Spark.*;
 public class Api {
 
     public static void main(String[] args) {
-        // default port 4567
+        port(8801);
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
 
-        // /tags
         get("/tags", (request, response) -> Series.getAllTags(dbi), json());
 
-        // /series/search?term=xxx
         get("/series/search",  (request, response) -> Series.search(dbi, request.queryParams("term")), json());
 
-        // /recent
         get("/recent", (request, response) -> Recent.findAll(dbi), json());
 
-        // /tag?tag=xxx
         get("/tag", (request, response) -> Series.findAllByTag(dbi, request.queryParams("tag")), json());
 
         get("/episode/series/:id", (request, response) -> {
@@ -41,7 +37,6 @@ public class Api {
             return allBySeriesId;
         }, json());
 
-        // /episode/watched/1
         get("/episode/watched/:id", (request, response) -> {
             Episode.setAsWatched(dbi, Integer.parseInt(request.params("id")));
             return null;
