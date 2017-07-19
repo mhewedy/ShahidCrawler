@@ -14,7 +14,7 @@ public class Recent {
     // ------------------------ DB Operations
 
     public static List<Series> findAll(DBI dbi) {
-        return dbi.withHandle(h -> h.select("select series.* from series join recent on series.id = recent.series_id order by recent.id desc"))
+        return dbi.withHandle(h -> h.select(Series.getSearchBaseQuery() + " where series.id in (select series_id from recent order by id desc)"))
                 .stream()
                 .map(Series::fromDb)
                 .collect(toList());
