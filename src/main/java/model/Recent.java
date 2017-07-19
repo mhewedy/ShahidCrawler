@@ -9,7 +9,9 @@ import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class Recent {
-//    private int seriesId;
+    private int seriesId;
+
+    // ------------------------ DB Operations
 
     public static List<Series> findAll(DBI dbi) {
         return dbi.withHandle(h -> h.select("select series.* from series join recent on series.id = recent.series_id order by recent.id desc"))

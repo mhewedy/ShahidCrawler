@@ -23,6 +23,8 @@ public class Episode {
     private int durationSeconds;
     private boolean watched;
 
+    // ------------------------ DB Operations
+
     public void save(Handle handle, String seriesSid) {
         Object seriesId = handle.select("select id from series where sid = ?", seriesSid).get(0).get("id");
 
@@ -30,13 +32,8 @@ public class Episode {
                 " (?, ?, ?, ?)", this.sid, this.videoUrl, this.durationSeconds, seriesId);
     }
 
-    @Override
-    public String toString() {
-        return "Episode{" +
-                "sid='" + sid + '\'' +
-                ", videoUrl='" + videoUrl + '\'' +
-                ", durationSeconds=" + durationSeconds +
-                '}';
+    public static void setAsWatched(DBI dbi, int episodeId){
+        dbi.withHandle(h -> h.update("update episode set watched = 1 where id = ?", episodeId));
     }
 
     public static List<Episode> findAllBySeriesId(DBI dbi, int seriesId) {
@@ -45,6 +42,8 @@ public class Episode {
                 .map(Episode::fromDb)
                 .collect(toList());
     }
+
+    // --------------------- Crawling Operations
 
     public static List<Episode> getEpisodesList(String seriesId) throws Exception {
         System.out.println("start processing series: " + seriesId);
@@ -69,9 +68,7 @@ public class Episode {
         return episodesList;
     }
 
-    public static void setAsWatched(DBI dbi, int episodeId){
-        dbi.withHandle(h -> h.update("update episode set watched = 1 where id = ?", episodeId));
-    }
+    // -------------- private Operations
 
     private static List<String> getToC(String seriesId) throws Exception {
         String episodesUrl = Constants.EPISODES_URL.replace("$1", seriesId).replace("$2", getSectionId(seriesId));
@@ -110,5 +107,15 @@ public class Episode {
     private static class Data {
         private String url;
         private int durationSeconds;
+    }
+    // ---------------------------
+
+    @Override
+    public String toString() {
+        return "Episode{" +
+                "sid='" + sid + '\'' +
+                ", videoUrl='" + videoUrl + '\'' +
+                ", durationSeconds=" + durationSeconds +
+                '}';
     }
 }

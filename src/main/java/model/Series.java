@@ -28,6 +28,8 @@ public class Series {
         return sid;
     }
 
+    // ------------------------ DB Operations
+
     public boolean notExists(Handle handle) {
         Long count = (Long) handle.select("select count(*) as count from series where sid = ?", this.sid)
                 .get(0).get("count");
@@ -51,16 +53,6 @@ public class Series {
         }
     }
 
-    @Override
-    public String toString() {
-        return "Series{" +
-                "sid='" + sid + '\'' +
-                ", title='" + title + '\'' +
-                ", posterUrl='" + posterUrl + '\'' +
-                ", tag=" + tags +
-                '}';
-    }
-
     public static List<Series> search(DBI dbi, String term) {
         return dbi.withHandle(h -> h.select("select * from series where title like ?", "%" + term + "%"))
                 .stream()
@@ -82,6 +74,8 @@ public class Series {
                 .map(row -> (String) row.get("tag"))
                 .collect(toList());
     }
+
+    // --------------------- Crawling Operations
 
     public static List<Series> getSeriesList() throws Exception {
         List<Series> idList = new ArrayList<>();
@@ -123,5 +117,17 @@ public class Series {
         series.title = (String) dbRow.get("title");
         series.posterUrl = (String) dbRow.get("poster_url");
         return series;
+    }
+
+    // ---------------------------
+
+    @Override
+    public String toString() {
+        return "Series{" +
+                "sid='" + sid + '\'' +
+                ", title='" + title + '\'' +
+                ", posterUrl='" + posterUrl + '\'' +
+                ", tag=" + tags +
+                '}';
     }
 }
