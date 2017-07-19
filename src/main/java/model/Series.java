@@ -54,14 +54,14 @@ public class Series {
     }
 
     public static List<Series> search(DBI dbi, String term) {
-        return dbi.withHandle(h -> h.select(getSearchBaseQuery() + "where title like ?", "%" + term + "%"))
+        return dbi.withHandle(h -> h.select("select * from series where title like ?", "%" + term + "%"))
                 .stream()
                 .map(Series::fromDb)
                 .collect(toList());
     }
 
     public static List<Series> findAllByTag(DBI dbi, String tag) {
-        return dbi.withHandle(h -> h.select(getSearchBaseQuery() + "where tag = ?", tag))
+        return dbi.withHandle(h -> h.select("select series.* from series join series_tag on series.id = series_tag.series_id join tag on tag.id = series_tag.tag_id where tag.tag = ?", tag))
                 .stream()
                 .map(Series::fromDb)
                 .collect(toList());
@@ -120,13 +120,6 @@ public class Series {
             series.tags = Stream.of(tags.split(",")).map(String::trim).collect(toList());
         }
         return series;
-    }
-
-    static String getSearchBaseQuery() {
-        return "select series.*, group_concat(tag.tag) as tags " +
-                "from series join series_tag on series.id = series_tag.series_id " +
-                "join tag on tag.id = series_tag.tag_id " +
-                "group by series.* ";
     }
 
     // ---------------------------
