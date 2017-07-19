@@ -9,5 +9,5 @@ public interface Config {
     String JDBC_URL = "jdbc:mysql://192.168.1.10:3306/shahid?useUnicode=true&characterEncoding=UTF-8";
     String JDBC_USERNAME = "root";
     String JDBC_PASSWORD = "system";
-    int MAX_RECENT = 10;
+    int MAX_RECENT = 20;
 }
