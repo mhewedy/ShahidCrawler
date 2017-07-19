@@ -10,3 +10,5 @@ I've tried to make the domain model objects not to be anemic by including the Cr
 The code is a fast-and-drity, written quickly just to achieve the purpose I wanted.
 
 The mobile app is written quickly in ionic, find it [here](https://github.com/mhewedy/shahid-mobile), I've choosed ionic because I am a web guy, I am more familure with Angular than Android (it is ~4 years since I last worked on android). I can say, Ionic is so much faster in development than android java development.
+
+I am [deploying](https://github.com/mhewedy/shahid/blob/master/run.sh) the this service on a Linux (ubuntu) box at home, and running the android app on both my wife's and mine devices.
