@@ -4,9 +4,11 @@ import model.Series;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.logging.PrintStreamLog;
 import spark.ResponseTransformer;
+import spark.utils.IOUtils;
 import util.Config;
 import util.Util;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,6 +45,19 @@ public class Api {
             Episode.setAsWatched(dbi, Integer.parseInt(request.params("id")));
             return null;
         }, json());
+
+        get("/download", (request, response) -> {
+            InputStream resourceAsStream = Api.class.getClassLoader().getResourceAsStream("shahid-mobile.apk");
+            response.header("Content-Disposition", "attachment; filename=shahid-mobile.apk");
+            response.type("application/force-download");
+
+            IOUtils.copy(resourceAsStream, response.raw().getOutputStream());
+
+            response.raw().getOutputStream().flush();
+            response.raw().getOutputStream().close();
+
+            return response.raw();
+        });
 
         after(((request, response) -> {
             response.type("application/json");
