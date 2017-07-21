@@ -23,9 +23,14 @@ public class Series {
     private String title;
     private String posterUrl;
     private List<String> tags;
+    private List<Episode> episodes;
 
     public String getSid() {
         return sid;
+    }
+
+    public void setEpisodes(List<Episode> episodes) {
+        this.episodes = episodes;
     }
 
     // ------------------------ DB Operations
@@ -72,6 +77,14 @@ public class Series {
                 .stream()
                 .map(row -> (String) row.get("tag"))
                 .collect(toList());
+    }
+
+    public static Series findById(DBI dbi, int id) {
+        return dbi.withHandle(h -> h.select("select series.*, group_concat(tag.tag) as tags from series join series_tag on series.id = series_tag.series_id join tag on tag.id = series_tag.tag_id where series.id = ? group by series.id", id))
+                .stream()
+                .findFirst()
+                .map(Series::fromDb)
+                .orElse(null);
     }
 
     // --------------------- Crawling Operations

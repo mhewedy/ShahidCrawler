@@ -30,11 +30,13 @@ public class Api {
 
         get("/episode/series/:id", (request, response) -> {
             int id = Integer.parseInt(request.params("id"));
-            List<Episode> allBySeriesId = Episode.findAllBySeriesId(dbi, id);
-            if (allBySeriesId.size() > 0) {
+
+            Series series = Series.findById(dbi, id);
+            if (series != null){
+                series.setEpisodes(Episode.findAllBySeriesId(dbi, id));
                 Recent.save(dbi, id);
             }
-            return allBySeriesId;
+            return series;
         }, json());
 
         get("/episode/watched/:id", (request, response) -> {
