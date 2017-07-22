@@ -1,4 +1,5 @@
 import model.Episode;
+import model.Movie;
 import model.Recent;
 import model.Series;
 import org.skife.jdbi.v2.DBI;
@@ -21,6 +22,10 @@ public class Api {
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
+
+        get("/movie/tags", (request, response) -> Movie.getAllTags(dbi), json());
+
+        get("/movie/tag", (request, response) -> transform(Movie.findAllByTag(dbi, request.queryParams("tag"))), json());
 
         get("/series/tags", (request, response) -> Series.getAllTags(dbi), json());
 
@@ -66,18 +71,18 @@ public class Api {
 
     }
 
-    private static List<List<Series>> transform(List<Series> seriesList) {
-        List<List<Series>> ret = new ArrayList<>();
+    private static List<List<?>> transform(List<?> list) {
+        List<List<?>> ret = new ArrayList<>();
 
-        List<Series> subList = null;
+        List subList = null;
 
-        for (int i = 0; i < seriesList.size(); i++) {
+        for (int i = 0; i < list.size(); i++) {
             if (i % 2 == 0) {
                 subList = new ArrayList<>();
                 ret.add(subList);
-                subList.add(seriesList.get(i));
+                subList.add(list.get(i));
             } else {
-                subList.add(seriesList.get(i));
+                subList.add(list.get(i));
                 subList = null;
             }
         }

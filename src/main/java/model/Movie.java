@@ -70,6 +70,13 @@ public class Movie {
                 .collect(toList());
     }
 
+    public static List<String> getAllTags(DBI dbi) {
+        return dbi.withHandle(h -> h.select("select distinct tag from tag join movie_tag on tag.id = movie_tag.tag_id order by tag asc"))
+                .stream()
+                .map(row -> (String) row.get("tag"))
+                .collect(toList());
+    }
+
     public static Movie findById(DBI dbi, int id) {
         return dbi.withHandle(h -> h.select("select movie.*, group_concat(tag.tag) as tags from movie join movie_tag on movie.id = movie_tag.movie_id join tag on tag.id = movie_tag.tag_id where movie.id = ? group by movie.id", id))
                 .stream()
