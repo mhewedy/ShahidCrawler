@@ -30,7 +30,9 @@ public class Recent {
                 .map(row -> String.valueOf(row.get("id")))
                 .collect(joining(", "));
 
-        dbi.withHandle(h -> h.update("delete from recent where id not in (" + recentIds + ")"));
+        if (recentIds.trim().length() > 0){
+            dbi.withHandle(h -> h.update("delete from recent where id not in (" + recentIds + ")"));
+        }
         dbi.withHandle(h -> h.insert("insert into recent (series_id) values (?)", seriesId));
     }
 }

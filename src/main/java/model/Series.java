@@ -116,9 +116,10 @@ public class Series {
         series.sid = secondDiv.attr("id");
         series.title = element.select(".title > a").text();
         series.posterUrl = element.select(".photo > img").attr("src");
-        Elements infoSpan = element.select(".info span");
-        series.episodeCount = Integer.parseInt(infoSpan.get(infoSpan.size() - 1).text());
-
+        String seriesCountText = element.select(".info span:last-child").text();
+        if (seriesCountText.trim().length() > 0){
+            series.episodeCount = Integer.parseInt(seriesCountText);
+        }
         Category[] categories = Util.GSON.fromJson(firstDiv.attr("categories"), Category[].class);
         series.tags = Stream.of(categories).map(Category::getName).collect(toList());
 
