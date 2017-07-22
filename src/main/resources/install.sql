@@ -48,5 +48,13 @@ CREATE TABLE movie(
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   sid   VARCHAR(50),
   title VARCHAR(250),
-  poster_url	VARCHAR(500)
+  poster_url	VARCHAR(500),
+  video_url VARCHAR(500),
+  duration_seconds	int
 )
+
+CREATE TABLE movie_tag(
+   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+   movie_id	int,
+   tag_id	int
+);

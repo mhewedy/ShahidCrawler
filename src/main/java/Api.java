@@ -22,13 +22,13 @@ public class Api {
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
 
-        get("/tags", (request, response) -> Series.getAllTags(dbi), json());
+        get("/series/tags", (request, response) -> Series.getAllTags(dbi), json());
 
         get("/series/search", (request, response) -> transform(Series.search(dbi, request.queryParams("term"))), json());
 
-        get("/recent", (request, response) -> transform(Recent.findAll(dbi)), json());
+        get("/series/recent", (request, response) -> transform(Recent.findAll(dbi)), json());
 
-        get("/tag", (request, response) -> transform(Series.findAllByTag(dbi, request.queryParams("tag"))), json());
+        get("/series/tag", (request, response) -> transform(Series.findAllByTag(dbi, request.queryParams("tag"))), json());
 
         get("/episode/series/:id", (request, response) -> {
             int id = Integer.parseInt(request.params("id"));

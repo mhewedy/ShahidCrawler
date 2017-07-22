@@ -8,6 +8,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import model.Episode;
+import model.Movie;
 import model.Series;
 
 import org.skife.jdbi.v2.DBI;
@@ -18,10 +19,11 @@ import util.Config;
 public class Main {
 
     public static void main(String[] args) throws Exception {
-        startCrawler();
+//        startCrawlerSeries();
+        startCrawlerMovie();
     }
 
-    private static void startCrawler() throws Exception{
+    private static void startCrawlerSeries() throws Exception{
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
@@ -44,6 +46,18 @@ public class Main {
                 System.out.println("series " + series.getSid() + " already exists.");
             }
         }
+        handle.close();
+    }
+
+    private static void startCrawlerMovie() throws Exception{
+
+        DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
+        dbi.setSQLLog(new PrintStreamLog());
+        Handle handle = dbi.open();
+
+        skipSSL();
+
+        Movie.saveMovieList(handle);
         handle.close();
     }
 

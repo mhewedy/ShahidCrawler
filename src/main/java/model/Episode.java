@@ -57,7 +57,7 @@ public class Episode {
             episode.sid = aToC;
             try{
                 String body = connectAndGetString(Constants.GET_PLAYER_URL.replace("$1", aToC));
-                Resp resp = Util.GSON.fromJson(body, Resp.class);
+                PCResponse.Resp resp = Util.GSON.fromJson(body, PCResponse.Resp.class);
                 if (resp.data.url == null) {
                     System.err.println(body);
                 }
@@ -104,14 +104,6 @@ public class Episode {
         return episode;
     }
 
-    private static class Resp {
-        private Data data;
-    }
-
-    private static class Data {
-        private String url;
-        private int durationSeconds;
-    }
     // ---------------------------
 
     @Override
