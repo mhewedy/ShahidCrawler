@@ -32,7 +32,7 @@ CREATE TABLE episode
 (
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   sid   VARCHAR(50),
-  video_url VARCHAR(250),
+  video_url VARCHAR(500),
   duration_seconds	int,
   watched tinyint
   series_id	int
@@ -43,3 +43,10 @@ CREATE TABLE recent
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   series_id	int
 );
+
+CREATE TABLE movie(
+  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  sid   VARCHAR(50),
+  title VARCHAR(250),
+  poster_url	VARCHAR(500)
+)

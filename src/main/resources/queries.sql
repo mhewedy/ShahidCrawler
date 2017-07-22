@@ -8,5 +8,5 @@ select distinct series.id, series.title, series.sid from series join episode on 
 select series.id, series.title, (series.episode_count - 1 -  count(*) ) as diff from series join episode on series.id = episode.series_id group by series.id having diff <> 0;
 
 -- delete all invalid series data
-delete from series where id in (12, 42);
-delete from episode where series_id in (12, 42);
+delete from series where id in ();
+delete from episode where series_id in ();
