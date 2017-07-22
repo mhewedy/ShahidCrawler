@@ -25,21 +25,25 @@ public class Api {
 
         get("/movie/tags", (request, response) -> Movie.getAllTags(dbi), json());
 
-        get("/movie/tag", (request, response) -> transform(Movie.findAllByTag(dbi, request.queryParams("tag"))), json());
+        get("/movie/tag", (request, response) -> new SearchResult(null, transform(Movie.findAllByTag(dbi, request.queryParams("tag")))), json());
 
         get("/series/tags", (request, response) -> Series.getAllTags(dbi), json());
 
-        get("/series/search", (request, response) -> transform(Series.search(dbi, request.queryParams("term"))), json());
+        get("/series/tag", (request, response) -> new SearchResult(transform(Series.findAllByTag(dbi, request.queryParams("tag"))), null), json());
 
-        get("/series/recent", (request, response) -> transform(Recent.findAll(dbi)), json());
+        get("/search", (request, response) -> {
+            List<List<?>> seriesList = transform(Series.search(dbi, request.queryParams("term")));
+            List<List<?>> movieList = transform(Movie.search(dbi, request.queryParams("term")));
+            return new SearchResult(seriesList, movieList);
+        }, json());
 
-        get("/series/tag", (request, response) -> transform(Series.findAllByTag(dbi, request.queryParams("tag"))), json());
+        get("/series/recent", (request, response) -> new SearchResult(transform(Recent.findAll(dbi)), null), json());
 
         get("/episode/series/:id", (request, response) -> {
             int id = Integer.parseInt(request.params("id"));
 
             Series series = Series.findById(dbi, id);
-            if (series != null){
+            if (series != null) {
                 series.setEpisodes(Episode.findAllBySeriesId(dbi, id));
                 Recent.save(dbi, id);
             }
@@ -92,6 +96,16 @@ public class Api {
 
     private static ResponseTransformer json() {
         return (model) -> Util.GSON.toJson(model);
+    }
+
+    static class SearchResult {
+        private List<List<?>> seriesList;
+        private List<List<?>> movieList;
+
+        SearchResult(List<List<?>> seriesList, List<List<?>> movieList) {
+            this.seriesList = seriesList;
+            this.movieList = movieList;
+        }
     }
 
 }
