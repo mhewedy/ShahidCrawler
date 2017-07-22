@@ -23,7 +23,7 @@ public class JSoupHelper {
 
     private static void sleep() {
         try {
-            Thread.sleep(100);
+            Thread.sleep(10);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

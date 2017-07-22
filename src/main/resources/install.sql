@@ -2,9 +2,9 @@
 
 -- sid means "shahid id"
 
-CREATE DATABASE shahid CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE DATABASE shahid_db CHARACTER SET utf8 COLLATE utf8_general_ci;
 
-USE shahid;
+USE shahid_db;
 
 CREATE TABLE tag(
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -16,7 +16,8 @@ CREATE TABLE series(
   id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
   sid   VARCHAR(50),
   title VARCHAR(250),
-  poster_url	VARCHAR(4000)
+  poster_url	VARCHAR(4000),
+  episode_count int
 );
 
 
@@ -33,7 +34,7 @@ CREATE TABLE episode
   sid   VARCHAR(50),
   video_url VARCHAR(250),
   duration_seconds	int,
-  watched tinyint,
+  watched tinyint
   series_id	int
 );
 

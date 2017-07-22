@@ -53,15 +53,19 @@ public class Episode {
         List<String> toC = getToC(seriesId);
 
         for (String aToC : toC) {
-            String body = connectAndGetString(Constants.GET_PLAYER_URL.replace("$1", aToC));
-            Resp resp = Util.GSON.fromJson(body, Resp.class);
-            if (resp.data.url == null) {
-                System.err.println(body);
-            }
             Episode episode = new Episode();
             episode.sid = aToC;
-            episode.videoUrl = resp.data.url;
-            episode.durationSeconds = resp.data.durationSeconds;
+            try{
+                String body = connectAndGetString(Constants.GET_PLAYER_URL.replace("$1", aToC));
+                Resp resp = Util.GSON.fromJson(body, Resp.class);
+                if (resp.data.url == null) {
+                    System.err.println(body);
+                }
+                episode.videoUrl = resp.data.url;
+                episode.durationSeconds = resp.data.durationSeconds;
+            }catch (Exception ex){
+                System.err.println(ex.getMessage() + " series sid: " + seriesId + ", episode sid: " + aToC);
+            }
             episodesList.add(episode);
         }
         System.out.println("got episode list for series: " + seriesId + ", size: " + episodesList.size());

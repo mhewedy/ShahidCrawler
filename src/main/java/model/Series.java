@@ -22,6 +22,7 @@ public class Series {
     private String sid;
     private String title;
     private String posterUrl;
+    private int episodeCount;
     private List<String> tags;
     private List<Episode> episodes;
 
@@ -47,8 +48,8 @@ public class Series {
                 (tag -> handle.execute("insert into tag (tag) select ? from dual where not exists " +
                         "(select * from tag where tag= ? )", tag, tag));
         //save
-        handle.insert("insert into series (sid, title, poster_url) values (?, ?, ?)",
-                this.sid, this.title, this.posterUrl);
+        handle.insert("insert into series (sid, title, poster_url, episode_count) values (?, ?, ?, ?)",
+                this.sid, this.title, this.posterUrl, this.episodeCount);
         //linkWithTags
         Object seriesId = handle.select("select id from series where sid = ?", this.sid).get(0).get("id");
 
@@ -115,6 +116,8 @@ public class Series {
         series.sid = secondDiv.attr("id");
         series.title = element.select(".title > a").text();
         series.posterUrl = element.select(".photo > img").attr("src");
+        Elements infoSpan = element.select(".info span");
+        series.episodeCount = Integer.parseInt(infoSpan.get(infoSpan.size() - 1).text());
 
         Category[] categories = Util.GSON.fromJson(firstDiv.attr("categories"), Category[].class);
         series.tags = Stream.of(categories).map(Category::getName).collect(toList());
@@ -127,6 +130,7 @@ public class Series {
         series.id = (Integer) dbRow.get("id");
         series.sid = (String) dbRow.get("sid");
         series.title = (String) dbRow.get("title");
+        series.episodeCount = (int) dbRow.get("episode_count");
         series.posterUrl = (String) dbRow.get("poster_url");
         String tags = ((String) dbRow.get("tags"));
         if (tags != null) {
