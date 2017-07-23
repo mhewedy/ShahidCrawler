@@ -72,7 +72,6 @@ public class Api {
             response.type("application/json");
             response.header("Access-Control-Allow-Origin", "*");
         }));
-
     }
 
     private static List<List<?>> transform(List<?> list) {
