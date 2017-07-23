@@ -52,7 +52,7 @@ CREATE TABLE movie(
   video_url VARCHAR(500),
   la_url VARCHAR(2000),
   duration_seconds	int
-)
+);
 
 CREATE TABLE movie_tag(
    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

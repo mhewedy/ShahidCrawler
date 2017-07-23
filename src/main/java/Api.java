@@ -98,7 +98,7 @@ public class Api {
         return (model) -> Util.GSON.toJson(model);
     }
 
-    static class SearchResult {
+    private static class SearchResult {
         private List<List<?>> seriesList;
         private List<List<?>> movieList;
 
