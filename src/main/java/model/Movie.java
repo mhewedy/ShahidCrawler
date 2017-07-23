@@ -23,6 +23,7 @@ public class Movie {
     private String title;
     private String posterUrl;
     private String videoUrl;
+    private String laUrl;
     private int durationSeconds;
     private List<String> tags;
 
@@ -89,13 +90,22 @@ public class Movie {
 
     private static Movie getVideoUrl(Movie movie) {
         try {
-            String body = connectAndGetString(Constants.GET_PLAYER_URL.replace("$1", movie.sid));
-            PCResponse.Resp resp = Util.GSON.fromJson(body, PCResponse.Resp.class);
-            if (resp.data.url == null) {
-                System.err.println(body);
+            String body = connectAndGetString(Constants.MOVIE_PLAYER_URL.replace("$1", movie.sid));
+            Dto.PlayerContent playerContent = Util.GSON.fromJson(body, Dto.PlayerContent.class);
+            if (playerContent.data.url == null) {
+                System.err.println("movie: " + movie.sid + ", get player Url failed: " + body);
             }
-            movie.videoUrl = resp.data.url;
-            movie.durationSeconds = resp.data.durationSeconds;
+            movie.videoUrl = playerContent.data.url;
+            movie.durationSeconds = playerContent.data.durationSeconds;
+
+            long now = System.currentTimeMillis();
+            body = connectAndGetString(Constants.MOVIE_DRM_URL.replace("$1", movie.sid).replace("$2", String.valueOf(now)).replace("$3", String.valueOf(now)));
+            playerContent = Util.GSON.fromJson(body, Dto.PlayerContent.class);
+            if (playerContent.data.signature == null) {
+                System.err.println("movie: " + movie.sid + ", get la Url failed: " + body);
+            }
+            movie.laUrl = playerContent.data.signature;
+
         } catch (Exception ex) {
             System.err.println(ex.getMessage() + " movie sid: " + movie.sid);
         }
@@ -112,6 +122,7 @@ public class Movie {
         movie.title = (String) dbRow.get("title");
         movie.posterUrl = (String) dbRow.get("poster_url");
         movie.videoUrl = (String) dbRow.get("video_url");
+        movie.laUrl = (String) dbRow.get("la_url");
         movie.durationSeconds = (int) dbRow.get("duration_seconds");
         String tags = ((String) dbRow.get("tags"));
         if (tags != null) {
@@ -132,8 +143,8 @@ public class Movie {
                 (tag -> handle.execute("insert into tag (tag) select ? from dual where not exists " +
                         "(select * from tag where tag= ? )", tag, tag));
         //save
-        handle.insert("insert into movie (sid, title, poster_url, video_url, duration_seconds) values (?, ?, ?, ?, ?)",
-                this.sid, this.title, this.posterUrl, this.videoUrl, this.durationSeconds);
+        handle.insert("insert into movie (sid, title, poster_url, video_url, la_url, duration_seconds) values (?, ?, ?, ?, ?, ?)",
+                this.sid, this.title, this.posterUrl, this.videoUrl, this.laUrl, this.durationSeconds);
         //linkWithTags
         Object movieId = handle.select("select id from movie where sid = ?", this.sid).get(0).get("id");
 

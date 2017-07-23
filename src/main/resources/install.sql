@@ -50,6 +50,7 @@ CREATE TABLE movie(
   title VARCHAR(250),
   poster_url	VARCHAR(500),
   video_url VARCHAR(500),
+  la_url VARCHAR(2000),
   duration_seconds	int
 )
 

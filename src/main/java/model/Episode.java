@@ -45,37 +45,37 @@ public class Episode {
 
     // --------------------- Crawling Operations
 
-    public static List<Episode> getEpisodesList(String seriesId) throws Exception {
-        System.out.println("start processing series: " + seriesId);
+    public static List<Episode> getEpisodesList(String seriesSid) throws Exception {
+        System.out.println("start processing series: " + seriesSid);
 
         List<Episode> episodesList = new ArrayList<>();
 
-        List<String> toC = getToC(seriesId);
+        List<String> toC = getToC(seriesSid);
 
         for (String aToC : toC) {
             Episode episode = new Episode();
             episode.sid = aToC;
             try{
-                String body = connectAndGetString(Constants.GET_PLAYER_URL.replace("$1", aToC));
-                PCResponse.Resp resp = Util.GSON.fromJson(body, PCResponse.Resp.class);
-                if (resp.data.url == null) {
-                    System.err.println(body);
+                String body = connectAndGetString(Constants.SERIES_PLAYER_URL.replace("$1", aToC));
+                Dto.PlayerContent playerContent = Util.GSON.fromJson(body, Dto.PlayerContent.class);
+                if (playerContent.data.url == null) {
+                    System.err.println("series: " + seriesSid + " get player Url failed: " + body);
                 }
-                episode.videoUrl = resp.data.url;
-                episode.durationSeconds = resp.data.durationSeconds;
+                episode.videoUrl = playerContent.data.url;
+                episode.durationSeconds = playerContent.data.durationSeconds;
             }catch (Exception ex){
-                System.err.println(ex.getMessage() + " series sid: " + seriesId + ", episode sid: " + aToC);
+                System.err.println(ex.getMessage() + " series sid: " + seriesSid + ", episode sid: " + aToC);
             }
             episodesList.add(episode);
         }
-        System.out.println("got episode list for series: " + seriesId + ", size: " + episodesList.size());
+        System.out.println("got episode list for series: " + seriesSid + ", size: " + episodesList.size());
         return episodesList;
     }
 
     // -------------- private Operations
 
-    private static List<String> getToC(String seriesId) throws Exception {
-        String episodesUrl = Constants.EPISODES_URL.replace("$1", seriesId).replace("$2", getSectionId(seriesId));
+    private static List<String> getToC(String seriesSid) throws Exception {
+        String episodesUrl = Constants.EPISODES_URL.replace("$1", seriesSid).replace("$2", getSectionId(seriesSid));
 
         List<String> idList = new ArrayList<>();
 
@@ -84,12 +84,12 @@ public class Episode {
                     .select("body > div > .subitem").eachAttr("id"));
         }
         Collections.reverse(idList);
-        System.out.println("got toc for series: " + seriesId + ", " + idList);
+        System.out.println("got toc for series: " + seriesSid + ", " + idList);
         return idList;
     }
 
     private static String getSectionId(String seriesId) throws Exception {
-        Document doc = connectAndGetDoc(Constants.SERIES_URL.replace("$1", seriesId));
+        Document doc = connectAndGetDoc(Constants.PAGING_SECTION_URL.replace("$1", seriesId));
         String sectionText = doc.select("#main > div > div > div > div.pageing > ul > li.arrowlft > a").get(0).outerHtml();
         return sectionText.substring(sectionText.indexOf("showSection-") + 12, sectionText.indexOf("' + '.sort-' + "));
     }
