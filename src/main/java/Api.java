@@ -10,6 +10,7 @@ import util.Config;
 import util.Util;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
 import static spark.Spark.*;
@@ -24,18 +25,19 @@ public class Api {
 
         get("/movie/tags", (request, response) -> Movie.getAllTags(dbi), json());
 
-        get("/movie/tag", (request, response) -> new SearchResult(null, Movie.findAllByTag(dbi, request.queryParams("tag"))), json());
+        get("/movie/tag", (request, response) -> new SearchResult(null, transform(Movie.findAllByTag(dbi, request.queryParams("tag")))), json());
 
         get("/series/tags", (request, response) -> Series.getAllTags(dbi), json());
 
-        get("/series/tag", (request, response) -> new SearchResult(Series.findAllByTag(dbi, request.queryParams("tag")), null), json());
+        get("/series/tag", (request, response) -> new SearchResult(transform(Series.findAllByTag(dbi, request.queryParams("tag"))), null), json());
 
-        get("/search", (request, response) ->
-                        new SearchResult(Series.search(dbi, request.queryParams("term")),
-                                Movie.search(dbi, request.queryParams("term")))
-                , json());
+        get("/search", (request, response) -> {
+            List<List<?>> seriesList = transform(Series.search(dbi, request.queryParams("term")));
+            List<List<?>> movieList = transform(Movie.search(dbi, request.queryParams("term")));
+            return new SearchResult(seriesList, movieList);
+        }, json());
 
-        get("/series/recent", (request, response) -> new SearchResult(Recent.findAll(dbi), null), json());
+        get("/series/recent", (request, response) -> new SearchResult(transform(Recent.findAll(dbi)), null), json());
 
         get("/episode/series/:id", (request, response) -> {
             int id = Integer.parseInt(request.params("id"));
@@ -67,9 +69,29 @@ public class Api {
         });
 
         after(((request, response) -> {
+            response.type("application/json; charset=utf-8");
             response.header("Access-Control-Allow-Origin", "*");
-            response.header("Content-Type", "application/json; charset=utf-8");
         }));
+
+    }
+
+    private static List<List<?>> transform(List<?> list) {
+        List<List<?>> ret = new ArrayList<>();
+
+        List subList = null;
+
+        for (int i = 0; i < list.size(); i++) {
+            if (i % 2 == 0) {
+                subList = new ArrayList<>();
+                ret.add(subList);
+                subList.add(list.get(i));
+            } else {
+                subList.add(list.get(i));
+                subList = null;
+            }
+        }
+
+        return ret;
     }
 
     private static ResponseTransformer json() {
@@ -77,12 +99,13 @@ public class Api {
     }
 
     private static class SearchResult {
-        private List<Series> seriesList;
-        private List<Movie> movieList;
+        private List<List<?>> seriesList;
+        private List<List<?>> movieList;
 
-        SearchResult(List<Series> seriesList, List<Movie> movieList) {
+        SearchResult(List<List<?>> seriesList, List<List<?>> movieList) {
             this.seriesList = seriesList;
             this.movieList = movieList;
         }
     }
+
 }
