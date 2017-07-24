@@ -4,11 +4,13 @@ import model.Recent;
 import model.Series;
 import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.logging.PrintStreamLog;
+import spark.Response;
 import spark.ResponseTransformer;
 import spark.utils.IOUtils;
 import util.Config;
 import util.Util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -55,24 +57,27 @@ public class Api {
             return null;
         }, json());
 
-        get("/download", (request, response) -> {
-            InputStream resourceAsStream = Api.class.getClassLoader().getResourceAsStream("shahid-mobile.apk");
-            response.header("Content-Disposition", "attachment; filename=shahid-mobile.apk");
-            response.type("application/force-download");
-
-            IOUtils.copy(resourceAsStream, response.raw().getOutputStream());
-
-            response.raw().getOutputStream().flush();
-            response.raw().getOutputStream().close();
-
-            return response.raw();
-        });
+        get("/apk/download/explorer", (request, response) -> download(response, "shahid-explorer.apk"));
+        get("/apk/download/player", (request, response) -> download(response, "shahid-player.apk"));
 
         after(((request, response) -> {
             response.type("application/json; charset=utf-8");
             response.header("Access-Control-Allow-Origin", "*");
         }));
 
+    }
+
+    private static Object download(Response response, String fileName) throws IOException {
+        InputStream resourceAsStream = Api.class.getClassLoader().getResourceAsStream(fileName);
+        response.header("Content-Disposition", "attachment; filename=shahid-mobile.apk");
+        response.type("application/force-download");
+
+        IOUtils.copy(resourceAsStream, response.raw().getOutputStream());
+
+        response.raw().getOutputStream().flush();
+        response.raw().getOutputStream().close();
+
+        return response.raw();
     }
 
     private static List<List<?>> transform(List<?> list) {
