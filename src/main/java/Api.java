@@ -22,6 +22,8 @@ public class Api {
     public static void main(String[] args) {
         port(8801);
 
+        staticFileLocation("/public");
+
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
 
@@ -57,8 +59,8 @@ public class Api {
             return null;
         }, json());
 
-        get("/apk/download/explorer", (request, response) -> download(response, "shahid-explorer.apk"));
-        get("/apk/download/player", (request, response) -> download(response, "shahid-player.apk"));
+        get("/apk/download/explorer", (request, response) -> download(response, "apk/shahid-explorer.apk"));
+        get("/apk/download/player", (request, response) -> download(response, "apk/shahid-player.apk"));
 
         after(((request, response) -> {
             response.type("application/json; charset=utf-8");
