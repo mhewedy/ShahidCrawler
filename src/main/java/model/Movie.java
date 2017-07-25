@@ -43,6 +43,20 @@ public class Movie {
                 .collect(toList());
     }
 
+    public static List<Movie> findAllNoLAUrlByTag(DBI dbi, String tag) {
+        return dbi.withHandle(h -> h.select("select movie.* from movie join movie_tag on movie.id = movie_tag.movie_id join tag on tag.id = movie_tag.tag_id where la_url is null and tag.tag = ?", tag))
+                .stream()
+                .map(Movie::fromDb)
+                .collect(toList());
+    }
+
+    public static List<String> getAllTagsNoLAUrl(DBI dbi) {
+        return dbi.withHandle(h -> h.select("select distinct tag from tag join movie_tag on tag.id = movie_tag.tag_id join movie on movie_tag.movie_id = movie.id where movie.la_url is null order by tag asc"))
+                .stream()
+                .map(row -> (String) row.get("tag"))
+                .collect(toList());
+    }
+
     public static List<String> getAllTags(DBI dbi) {
         return dbi.withHandle(h -> h.select("select distinct tag from tag join movie_tag on tag.id = movie_tag.tag_id order by tag asc"))
                 .stream()

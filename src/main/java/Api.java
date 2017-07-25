@@ -25,9 +25,9 @@ public class Api {
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
 
-        get("/movie/tags", (request, response) -> Movie.getAllTags(dbi), json());
+        get("/movie/tags", (request, response) -> Movie.getAllTagsNoLAUrl(dbi), json());
 
-        get("/movie/tag", (request, response) -> new SearchResult(null, transform(Movie.findAllByTag(dbi, request.queryParams("tag")))), json());
+        get("/movie/tag", (request, response) -> new SearchResult(null, transform(Movie.findAllNoLAUrlByTag(dbi, request.queryParams("tag")))), json());
 
         get("/series/tags", (request, response) -> Series.getAllTags(dbi), json());
 
