@@ -591,6 +591,8 @@ sampleplayer.CastPlayer.prototype.preloadVideo_ = function(mediaInformation) {
     'url': url,
     'mediaElement': self.mediaElement_
   });
+  setHostLicenseUrl(host, mediaInformation);
+
   host.onError = function() {
     self.preloadPlayer_.unload();
     self.preloadPlayer_ = null;
@@ -833,6 +835,8 @@ sampleplayer.CastPlayer.prototype.loadVideo_ = function(info) {
         'url': url,
         'mediaElement': this.mediaElement_
       });
+      setHostLicenseUrl(host, info.message.media);
+
       host.onError = loadErrorCallback;
       this.player_ = new cast.player.api.Player(host);
       this.player_.load(protocolFunc(host));
@@ -2105,3 +2109,12 @@ sampleplayer.isCastForAudioDevice_ = function() {
   }
   return false;
 };
+
+function setHostLicenseUrl(host, mediaInformation){
+    if (host && mediaInformation.customData && mediaInformation.customData.laUrl){
+        this.log_('setting host la url: ' +  mediaInformation.customData.laUrl);
+        host.licenseUrl = mediaInformation.customData.laUrl;
+    }else{
+      this.log_('host or mediaInformation.customData not set!, host: ' +  host + ', mediaInformation.customData: ' +  mediaInformation.customData);
+    }
+}
