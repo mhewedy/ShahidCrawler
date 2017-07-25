@@ -59,8 +59,8 @@ public class Api {
             return null;
         }, json());
 
-        get("/apk/download/explorer", (request, response) -> download(response, "apk/shahid-explorer.apk"));
-        get("/apk/download/player", (request, response) -> download(response, "apk/shahid-player.apk"));
+        get("/download/shahid-explorer.apk", (request, response) -> download(response, "apk/shahid-explorer.apk"));
+        get("/download/shahid-player.apk", (request, response) -> download(response, "apk/shahid-player.apk"));
 
         after(((request, response) -> {
             response.type("application/json; charset=utf-8");
