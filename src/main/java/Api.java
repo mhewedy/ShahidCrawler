@@ -27,6 +27,8 @@ public class Api {
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
 
+        get("/movie/tags/:id", (request, response) -> Movie.getAllTags(dbi, Integer.parseInt(request.params("id"))), json());
+
         get("/movie/tags", (request, response) -> Movie.getAllTagsNoLAUrl(dbi), json());
 
         get("/movie/tag", (request, response) -> new SearchResult(null, transform(Movie.findAllNoLAUrlByTag(dbi, request.queryParams("tag")))), json());
@@ -59,8 +61,9 @@ public class Api {
             return null;
         }, json());
 
-        get("/download/shahid-explorer.apk", (request, response) -> download(response, "apk/shahid-explorer.apk"));
-        get("/download/shahid-player.apk", (request, response) -> download(response, "apk/shahid-player.apk"));
+        // /download/shahid-explorer.apk
+        // /download/shahid-player.apk
+        get("/download/:file", (request, response) -> download(response, "apk/" + request.params("file"), request.params("file")));
 
         after(((request, response) -> {
             response.type("application/json; charset=utf-8");
@@ -69,9 +72,11 @@ public class Api {
 
     }
 
-    private static Object download(Response response, String fileName) throws IOException {
+    private static Object download(Response response, String fileName, String downloadFileName)
+            throws IOException {
+
         InputStream resourceAsStream = Api.class.getClassLoader().getResourceAsStream(fileName);
-        response.header("Content-Disposition", "attachment; filename=shahid-mobile.apk");
+        response.header("Content-Disposition", "attachment; filename=" + downloadFileName);
         response.type("application/force-download");
 
         IOUtils.copy(resourceAsStream, response.raw().getOutputStream());
