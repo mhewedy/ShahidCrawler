@@ -13,6 +13,7 @@ import util.Util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static spark.Spark.*;
@@ -26,6 +27,17 @@ public class Api {
 
         DBI dbi = new DBI(Config.JDBC_URL, Config.JDBC_USERNAME, Config.JDBC_PASSWORD);
         dbi.setSQLLog(new PrintStreamLog());
+
+        final String[] NON_JSON_PATH = {"/"};
+
+
+        get("/", (request, response) -> {
+            response.type("text/html");
+            String html = "";
+            html += "<div><a href='/download/shahid-explorer.apk'>explorer</a></div>";
+            html += "<div><a href='/download/shahid-player.apk'>player</a></div>";
+            return html;
+        } );
 
         get("/movie/tags/:id", (request, response) -> Movie.getAllTags(dbi, Integer.parseInt(request.params("id"))), json());
 
@@ -66,10 +78,13 @@ public class Api {
         get("/download/:file", (request, response) -> download(response, "apk/" + request.params("file"), request.params("file")));
 
         after(((request, response) -> {
-            response.type("application/json; charset=utf-8");
-            response.header("Access-Control-Allow-Origin", "*");
-        }));
 
+            if (Arrays.stream(NON_JSON_PATH).noneMatch(path -> path.equals(request.pathInfo()))){
+                response.type("application/json; charset=utf-8");
+                response.header("Access-Control-Allow-Origin", "*");
+            }
+
+        }));
     }
 
     private static Object download(Response response, String fileName, String downloadFileName)
